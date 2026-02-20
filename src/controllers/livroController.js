@@ -89,7 +89,7 @@ class LivroController {
       });
     } catch (erro) {
       res.status(500).json({
-        message: "Erro ao deletar livro",
+        message: `${erro.message} - Erro ao deletar livro`,
       });
     }
   }
