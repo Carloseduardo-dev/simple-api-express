@@ -1,3 +1,4 @@
+import { Autor } from "../models/Autor.js";
 import Livro from "../models/Livro.js";
 
 class LivroController {
@@ -34,8 +35,21 @@ class LivroController {
 
   // cadastrar livro (POST)
   static async registerLivro(req, res) {
+    const data = req.body;
     try {
-      const newLivro = await Livro.create(req.body);
+      const autorId = await Autor.findById(data.autor);
+      if (!autorId) {
+        return res.status(404).json({
+          message: `Autor não encontrado`,
+        });
+      }
+      const livroCompleto = {
+        ...data,
+        autor: autorId.toObject(),
+      };
+
+      const newLivro = await Livro.create(livroCompleto);
+
       res.status(201).json({
         message: "Criado com sucesso",
         livro: newLivro,
