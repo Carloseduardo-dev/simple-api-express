@@ -2,50 +2,47 @@ import { Autor } from "../models/Autor.js";
 
 class AutorController {
   // list autor (GET)
-  static async listarAutor(req, res) {
+  static listarAutor = async (req, res, next) => {
     try {
-      const listarAutor = await Autor.find({});
-      res.status(200).json(listarAutor);
+      const autoresResultado = await Autor.find({});
+      res.status(200).json(autoresResultado);
     } catch (erro) {
-      res.status(500).json({
-        message: `${erro.message} - Erro ao listar autores`,
-      });
+      next(erro);
     }
-  }
+  };
 
   // list autor pelo Id (GET)
-  static async ListarAutorById(req, res) {
+  static ListarAutorById = async (req, res, next) => {
     try {
-      const { id } = req.params.id;
+      const { id } = req.params;
       const autorId = await Autor.findById(id);
       if (!autorId) {
-        res.status(404).json({
+        return res.status(404).json({
           message: `Autor não encontrado!`,
         });
       }
       res.status(200).json(autorId);
     } catch (erro) {
-      res.status(500).json({
-        message: `${erro.message} - Erro ao listar autor`,
-      });
+      next(erro);
     }
-  }
+  };
   // cadastrar autor (POST)
-  static async registerAutor(req, res) {
+  static registerAutor = async (req, res, next) => {
     try {
-      const newAutor = await Autor.create(req.body);
-      res.status(200).json({
+      let autor = new Autor(req.body);
+
+      const autorResultado = await autor.save();
+
+      res.status(201).json({
         message: `Criado com sucesso`,
-        autor: newAutor,
+        autorResultado,
       });
     } catch (erro) {
-      res.status(400).json({
-        message: `${erro.message} - Falha ao criar autor`,
-      });
+      next(erro);
     }
-  }
+  };
   // atualizar autor (PUT)
-  static async updateAutorById(req, res) {
+  static updateAutorById = async (req, res, next) => {
     try {
       const { id } = req.params;
       const dadosAutor = req.body;
@@ -55,40 +52,34 @@ class AutorController {
         runValidators: true,
       });
       if (!autorAtualizado) {
-        res.status(404).json({
+        return res.status(404).json({
           message: `Autor não encontrado`,
         });
       }
       res.status(200).json({
-        message: `Autor atulizado!`,
-        autor: autorAtualizado,
+        message: `Autor atulizado com sucesso!`,
       });
     } catch (erro) {
-      res.status(500).json({
-        message: `${erro.message} - Erro ao atualizar autor.`,
-      });
+      next(erro);
     }
-  }
+  };
   // delete autor (DELETE)
-  static async deleteAutorById(req, res) {
+  static deleteAutorById = async (req, res, next) => {
     try {
       const { id } = req.params;
       const autorDeletado = await Autor.findOneAndDelete(id);
       if (!autorDeletado) {
-        res.status(404).json({
+        return res.status(404).json({
           message: `Autor não encontrado!`,
         });
       }
       res.status(200).json({
         message: `Deletado com sucesso!`,
-        autor: autorDeletado,
       });
     } catch (erro) {
-      res.status(500).json({
-        message: `${erro.message} - Erro ao deletar autor`,
-      });
+      next(erro);
     }
-  }
+  };
 }
 
 export default AutorController;

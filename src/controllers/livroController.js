@@ -3,19 +3,17 @@ import Livro from "../models/Livro.js";
 
 class LivroController {
   // listar livros (GET)
-  static async listLivros(req, res) {
+  static listLivros = async (req, res, next) => {
     try {
       const listarLivros = await Livro.find({});
       res.status(200).json(listarLivros);
     } catch (erro) {
-      res.status(500).json({
-        message: `${erro.message} - Erro ao listar livros`,
-      });
+      next(erro);
     }
-  }
+  };
 
   // listar livros pelo id (GET)
-  static async listLivroById(req, res) {
+  static listLivroById = async (req, res, next) => {
     try {
       const id = req.params.id;
       const livroId = await Livro.findById(id);
@@ -27,14 +25,12 @@ class LivroController {
 
       res.status(200).json(livroId);
     } catch (erro) {
-      res.status(500).json({
-        message: `${erro.message} - Erro ao listar livro`,
-      });
+      next(erro);
     }
-  }
+  };
 
   // cadastrar livro (POST)
-  static async registerLivro(req, res) {
+  static registerLivro = async (req, res, next) => {
     const data = req.body;
     try {
       const autorId = await Autor.findById(data.autor);
@@ -48,20 +44,18 @@ class LivroController {
         autor: autorId.toObject(),
       };
 
-      const newLivro = await Livro.create(livroCompleto);
+      const novoLivro = await Livro.create(livroCompleto);
 
       res.status(201).json({
         message: "Criado com sucesso",
-        livro: newLivro,
+        livro: novoLivro,
       });
     } catch (erro) {
-      res.status(400).json({
-        message: `${erro.message} - Falha ao criar livro`,
-      });
+      next(erro);
     }
-  }
+  };
   // atualizar livro (PUT)
-  static async updateLivroById(req, res) {
+  static updateLivroById = async (req, res, next) => {
     try {
       const { id } = req.params;
       const dadosLivro = req.body;
@@ -78,17 +72,14 @@ class LivroController {
 
       res.status(200).json({
         message: "Livro atualizado!",
-        livro: livroAtualizado,
       });
     } catch (erro) {
-      res.status(500).json({
-        message: `${erro.message} - Erro ao atualizar livro`,
-      });
+      next(erro);
     }
-  }
+  };
 
   // delete livro (DELETE)
-  static async deleteLivroById(req, res) {
+  static deleteLivroById = async (req, res, next) => {
     try {
       const { id } = req.params;
       const livroDeletado = await Livro.findByIdAndDelete(id);
@@ -99,17 +90,14 @@ class LivroController {
       }
       res.status(200).json({
         message: "Livro deletado com sucesso",
-        livroDeletado,
       });
     } catch (erro) {
-      res.status(500).json({
-        message: `${erro.message} - Erro ao deletar livro`,
-      });
+      next(erro);
     }
-  }
+  };
 
   // Filtro livro por editora (GET)
-  static async searchLivroEditora(req, res) {
+  static searchLivroEditora = async (req, res, next) => {
     const editora = req.query.editora;
     try {
       const livroPorEditora = await Livro.find({ editora: editora });
@@ -120,11 +108,9 @@ class LivroController {
       }
       res.status(200).json(livroPorEditora);
     } catch (erro) {
-      res.status(500).json({
-        message: `${erro.message} - Erro ao buscar livro, verifique seus parametros de busca!`,
-      });
+      next(erro);
     }
-  }
+  };
 }
 
 export default LivroController;
